@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>灵动岛播放器示例</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="/D-music/dynamic-island-player.css">
+</head>
+<body>
+  <script src="/D-music/dynamic-island-player.js"></script>
+  <script>
+    const player = new DynamicIslandPlayer();
+    // 加载播放列表
+    player.loadPlaylist('playlistData.json');
+    // 提示用户
+    alert('双击播放器可以切换收缩状态！');
+
+    // 自定义下一首功能
+    player.onNext = () => {
+      console.log('下一首');
+    }
+  </script>
+</body>
+</html>

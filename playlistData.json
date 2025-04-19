@@ -1,0 +1,16 @@
+{
+  "playlist": [
+    {
+      "title": "示例音乐1",
+      "artist": "歌手1",
+      "cover": "https://www.pldduck.top/favicon.ico",
+      "url": "http://music.163.com/song/media/outer/url?id=1831697228.mp3"
+    },
+    {
+      "title": "示例音乐2", 
+      "artist": "歌手2",
+      "cover": "https://www.pldduck.top/favicon.ico",
+      "url": "http://music.163.com/song/media/outer/url?id=1831697228.mp3"
+    }
+  ]
+}
