@@ -1,24 +1,48 @@
 <!DOCTYPE html>
+<!-- 
+  灵动岛音乐播放器主页面
+  功能：提供音乐播放器界面和基本功能
+  依赖：dynamic-island-player.css, dynamic-island-player.js
+-->
 <html>
 <head>
+  <!-- 移动端优化设置 -->
   <meta charset="UTF-8">
   <title>灵动岛播放器示例</title>
+ 
+<!--将下面这段代码加入head标签内-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="/D-music/dynamic-island-player.css">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+  <!-- 引入播放器样式文件 -->
+  <link rel="stylesheet" href="./D-music/dynamic-island-player.css">
+<!--将上面这段代码加入head标签内-->
+
 </head>
 <body>
-  <script src="/D-music/dynamic-island-player.js"></script>
+ 
+ 
+ 
+ <!--将下面这段代码加入body标签内-->
+ 
+  <!-- 引入播放器核心脚本 -->
+  <script src="./D-music/dynamic-island-player.js"></script>
   <script>
+    // 初始化播放器实例
     const player = new DynamicIslandPlayer();
     // 加载播放列表
-    player.loadPlaylist('playlistData.json');
-    // 提示用户
-    alert('双击播放器可以切换收缩状态！');
-
+    // 加载播放列表数据
+    player.loadPlaylist('./playlistData.json');
     // 自定义下一首功能
+    // 自定义下一首按钮点击事件
     player.onNext = () => {
       console.log('下一首');
     }
   </script>
+
+<!--将上面这段代码加入body标签内-->
+
 </body>
 </html>
