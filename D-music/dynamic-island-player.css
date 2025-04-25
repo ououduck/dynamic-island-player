@@ -33,7 +33,7 @@
   交互：显示指针，支持悬停放大
 */
 .dynamic-island-player.collapsed {
-  width: 120px;
+  width: 200px; /* 增加基础宽度 */
   height: 36px;
   padding: 0 12px;
   overflow: hidden;
@@ -59,7 +59,7 @@
 
 .dynamic-island-player.collapsed .song-title {
   font-size: 12px;
-  max-width: 90px;
+  max-width: 160px; /* 增加歌名显示宽度 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -424,72 +424,82 @@
 */
 @media (max-width: 768px) {
   .dynamic-island-player {
-    width: calc(100% - 30px);
-    max-width: 300px;
-    height: 60px;
-    padding: 0 12px;
-    top: 15px;
+    width: 280px;
+    height: 120px; /* 减小高度 */
+    padding: 0 15px 10px; /* 减小内边距 */
   }
 
   .cover-art {
-    width: 35px;
-    height: 35px;
-    margin-right: 12px;
+    width: 42px; /* 调整封面大小 */
+    height: 42px;
+    margin-right: 12px; /* 减小右边距 */
   }
 
   .player-info {
     flex: 1;
-    min-width: 0; /* 防止文本溢出 */
+    min-width: 0;
+  }
+
+  .song-title {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .artist {
+    font-size: 12px;
   }
 
   .controls {
-    gap: 8px;
+    gap: 6px; /* 减小按钮间距 */
     margin-left: 8px;
   }
 
   .control-btn {
-    width: 26px;
+    width: 26px; /* 减小按钮尺寸 */
     height: 26px;
-    padding: 5px;
+    padding: 3px;
   }
 
   .play-pause {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
   }
 
-  .search-btn {
-    width: 24px;
-    height: 24px;
+  .control-btn svg {
+    width: 11px; /* 缩小图标 */
+    height: 11px;
+  }
+
+  .play-pause svg {
+    width: 13px;
+    height: 13px;
   }
 
   .progress-container {
-    bottom: 15px;
-    left: 12px;
-    width: calc(100% - 24px);
+    bottom: 25px; /* 上移进度条 */
   }
 
   .time-display {
-    bottom: 13px;
-    right: 10px;
+    bottom: 23px;
     font-size: 9px;
   }
 
-  /* 搜索相关样式调整 */
-  .search-box {
-    width: 220px;
-    top: calc(100% + 8px);
+  /* 收缩状态优化 */
+  .dynamic-island-player.collapsed {
+    width: calc(100% - 30px);
+    max-width: 200px; /* 增加收缩状态宽度 */
+    height: 32px;
+    padding: 0 10px;
   }
 
-  .search-input {
-    padding: 6px 12px;
-    font-size: 13px;
+  .dynamic-island-player.collapsed .cover-art {
+    width: 22px;
+    height: 22px;
+    margin: 5px;
   }
 
-  .search-results {
-    width: 220px;
-    top: calc(100% + 40px);
-    max-height: 50vh;
+  .dynamic-island-player.collapsed .song-title {
+    font-size: 12px;
   }
 }
 
@@ -501,38 +511,27 @@
 */
 @media (max-width: 320px) {
   .dynamic-island-player {
-    max-width: 250px;
-    height: 55px;
-    padding: 0 10px;
-  }
-
-  .cover-art {
-    width: 30px;
-    height: 30px;
-    margin-right: 8px;
-  }
-
-  .song-title {
-    font-size: 12px;
-  }
-
-  .artist {
-    font-size: 10px;
-  }
-
-  .controls {
-    gap: 6px;
+    width: 260px;
+    height: 110px;
+    padding: 0 12px 8px;
   }
 
   .control-btn {
-    width: 22px;
-    height: 22px;
-    padding: 4px;
+    width: 24px;
+    height: 24px;
   }
 
   .play-pause {
     width: 28px;
     height: 28px;
+  }
+
+  .progress-container {
+    bottom: 22px;
+  }
+
+  .time-display {
+    bottom: 20px;
   }
 }
 

@@ -1,16 +1,31 @@
 {
-  "playlist": [
-    {
-      "title": "示例音乐1",
-      "artist": "歌手1",
-      "cover": "https://www.pldduck.top/favicon.ico",
-      "url": "http://music.163.com/song/media/outer/url?id=1831697228.mp3"
-    },
-    {
-      "title": "示例音乐2", 
-      "artist": "歌手2",
-      "cover": "https://www.pldduck.top/favicon.ico",
-      "url": "http://music.163.com/song/media/outer/url?id=1831697228.mp3"
-    }
-  ]
-}
+    "playlist": [
+      {
+        "title": "在你的身边",
+        "artist": "盛哲",
+        "cover": "http://p1.music.126.net/AYNBdRxJ8EdZo4xFjp7b4Q==/109951163191178425.jpg?param=130y130",
+        "url": "http://music.163.com/song/media/outer/url?id=475479888.mp3"
+      },
+      {
+        "title": "苦茶子", 
+        "artist": "Starling8 / MoreLearn 27 / FIVESTAR",
+        "cover": "http://p1.music.126.net/VjXYNoGC3lXajZDs0r35XQ==/109951167852652412.jpg?param=130y130",
+        "url": "http://music.163.com/song/media/outer/url?id=1922888354.mp3"
+      },
+      {
+        "title": "把回忆拼好给你", 
+        "artist": "王贰浪",
+        "cover": "http://p1.music.126.net/CBx2K_jEN3SNWwYztagPPw==/109951164485969446.jpg?param=130y130",
+        "url": "http://music.163.com/song/media/outer/url?id=1403318151.mp3"
+      },
+      {
+        "title": "哪里都是你", 
+        "artist": "队长",
+        "cover": "http://p2.music.126.net/lnOnBbP_H-052Hv5ls-QjA==/109951162964628408.jpg?param=130y130",
+        "url": "http://music.163.com/song/media/outer/url?id=488249475.mp3"
+      }
+    
+    
+
+    ]
+  }
