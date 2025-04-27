@@ -424,7 +424,7 @@
 */
 @media (max-width: 768px) {
   .dynamic-island-player {
-    width: 280px;
+    width: 300px;
     height: 120px; /* 减小高度 */
     padding: 0 15px 10px; /* 减小内边距 */
   }
@@ -511,7 +511,7 @@
 */
 @media (max-width: 320px) {
   .dynamic-island-player {
-    width: 260px;
+    width: 280px;
     height: 110px;
     padding: 0 12px 8px;
   }
