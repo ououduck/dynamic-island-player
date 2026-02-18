@@ -11,46 +11,20 @@
   transform: translateX(-50%);
   width: 460px; /* 增加宽度 */
   height: 140px; /* 增加高度 */
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(0, 0, 0, 0.8);
   border-radius: 30px;
   display: flex;
   align-items: center;
   padding: 0 20px 15px; /* 减小底部内边距 */
-  box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
   z-index: 9999;
   cursor: default; /* 移除指针样式 */
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   user-select: none; /* 禁止选中文本 */
   -webkit-tap-highlight-color: transparent; /* 禁止移动端点击高亮 */
   transform-origin: center top;
-  will-change: transform, width, height, backdrop-filter;
-  overflow: hidden;
-}
-
-/* 添加渐变边框效果 */
-.dynamic-island-player::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 30px;
-  padding: 1px;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.1), 
-    rgba(255, 255, 255, 0.05),
-    rgba(255, 255, 255, 0.1));
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+  will-change: transform, width, height;
 }
 
 /* 
@@ -65,9 +39,7 @@
   overflow: hidden;
   transform: translateX(-50%) scale(0.92);
   cursor: pointer; /* 收缩状态显示指针 */
-  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  backdrop-filter: blur(15px) saturate(160%);
-  -webkit-backdrop-filter: blur(15px) saturate(160%);
+  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .dynamic-island-player.collapsed:hover {
@@ -105,7 +77,10 @@
   transform: translateX(-50%);
 }
 
-/* 收缩状态悬停效果 - 已在前面的规则中定义 */
+/* 收缩状态悬停效果 */
+.dynamic-island-player.collapsed:hover {
+  transform: translateX(-50%) scale(0.96);
+}
 
 .dynamic-island-player * {
   user-select: none;
@@ -124,26 +99,10 @@
   margin-right: 20px;
   animation: rotate 6s linear infinite;
   animation-play-state: paused;
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  object-fit: cover;
-}
-
-.cover-art:hover {
-  transform: scale(1.05);
-  box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .cover-art.playing {
   animation-play-state: running;
-  box-shadow: 
-    0 0 20px rgba(52, 152, 219, 0.3),
-    0 4px 12px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(52, 152, 219, 0.2);
 }
 
 /* 
@@ -154,7 +113,6 @@
 .player-info {
   flex: 1;
   color: #fff;
-  min-width: 0; /* 确保文本溢出正常工作 */
 }
 
 .song-title {
@@ -163,37 +121,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  background: linear-gradient(90deg, #fff, #e0e0e0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.song-title:hover {
-  background: linear-gradient(90deg, #fff, #f0f0f0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .artist {
   font-size: 14px;
-  color: #bbb;
+  color: #aaa;
   margin: 3px 0 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: 400;
-  letter-spacing: 0.1px;
-  transition: all 0.3s ease;
-}
-
-.artist:hover {
-  color: #ddd;
 }
 
 /* 
@@ -219,47 +152,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.1);
   outline: none; /* 移除点击时的轮廓 */
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-/* 按钮点击涟漪效果 */
-.control-btn::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s;
-}
-
-.control-btn:active::after {
-  width: 100%;
-  height: 100%;
 }
 
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.08);
-  box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 .control-btn:active {
-  transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.25);
+  transform: scale(0.95);
 }
 
 .control-btn:focus {
@@ -270,23 +175,6 @@
   width: 45px; /* 增加主按钮尺寸 */
   height: 45px;
   font-size: 20px;
-  background: linear-gradient(135deg, 
-    rgba(52, 152, 219, 0.3), 
-    rgba(46, 204, 113, 0.3));
-  backdrop-filter: blur(12px);
-}
-
-.play-pause:hover {
-  background: linear-gradient(135deg, 
-    rgba(52, 152, 219, 0.4), 
-    rgba(46, 204, 113, 0.4));
-  transform: scale(1.1);
-}
-
-.play-pause:active {
-  background: linear-gradient(135deg, 
-    rgba(52, 152, 219, 0.5), 
-    rgba(46, 204, 113, 0.5));
 }
 
 .prev, .next {
@@ -309,136 +197,58 @@
   left: 20px;
   width: calc(100% - 40px);
   height: 3px;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(4px);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   overflow: visible;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s ease;
   z-index: 10;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 .progress-container:hover {
-  height: 5px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .progress-bar {
   position: relative;
   height: 100%;
-  background: linear-gradient(90deg, 
-    #3498db, 
-    #2ecc71,
-    #1abc9c); /* 更丰富的渐变颜色 */
+  background: linear-gradient(90deg, #3498db, #2ecc71); /* 更改进度条颜色 */
   width: 0%;
-  transition: width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: width 0.1s linear;
   border-radius: 4px;
-  box-shadow: 
-    0 0 15px rgba(46, 204, 113, 0.4),
-    0 0 5px rgba(52, 152, 219, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-/* 进度条流动效果 */
-.progress-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.3),
-    transparent);
-  animation: flow 2s linear infinite;
-  transform: translateX(-100%);
-}
-
-@keyframes flow {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.3); /* 添加发光效果 */
 }
 
 .progress-handle {
   position: absolute;
-  right: -6px;
+  right: -4px;
   top: 50%;
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 
-    0 0 10px rgba(255, 255, 255, 0.8),
-    0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   transform: translate(0, -50%) scale(0);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  z-index: 11;
-  cursor: grab;
-}
-
-.progress-handle:active {
-  cursor: grabbing;
-  transform: translate(0, -50%) scale(1.2);
-  box-shadow: 
-    0 0 15px rgba(255, 255, 255, 1),
-    0 3px 12px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
 }
 
 .progress-container:hover .progress-handle,
 .progress-container.dragging .progress-handle {
   transform: translate(0, -50%) scale(1);
-  box-shadow: 
-    0 0 12px rgba(255, 255, 255, 0.9),
-    0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .time-display {
   position: absolute;
   right: 15px;
   bottom: 33px; /* 配合进度条位置调整 */
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-.time-display:hover {
-  color: rgba(255, 255, 255, 0.9);
-  transform: scale(1.05);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-/* 添加封面旋转时的发光效果 */
-@keyframes glow {
-  0%, 100% { 
-    box-shadow: 
-      0 0 20px rgba(52, 152, 219, 0.3),
-      0 4px 12px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(52, 152, 219, 0.2);
-  }
-  50% { 
-    box-shadow: 
-      0 0 25px rgba(52, 152, 219, 0.4),
-      0 4px 12px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(52, 152, 219, 0.3);
-  }
-}
-
-.cover-art.playing {
-  animation: 
-    rotate 6s linear infinite,
-    glow 2s ease-in-out infinite;
 }
 
 /* 优化播放列表样式 */
@@ -600,58 +410,10 @@
   font-size: 14px;
 }
 
-/* 动画优化 - 使用更流畅的贝塞尔曲线 */
+/* 动画优化 */
 .dynamic-island-player,
 .dynamic-island-player * {
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* 添加展开/收缩时的缩放动画 */
-@keyframes expand {
-  0% { 
-    transform: translateX(-50%) scale(0.95); 
-    opacity: 0.8;
-    backdrop-filter: blur(10px) saturate(140%);
-  }
-  100% { 
-    transform: translateX(-50%) scale(1); 
-    opacity: 1;
-    backdrop-filter: blur(20px) saturate(180%);
-  }
-}
-
-@keyframes collapse {
-  0% { 
-    transform: translateX(-50%) scale(1); 
-    opacity: 1;
-    backdrop-filter: blur(20px) saturate(180%);
-  }
-  100% { 
-    transform: translateX(-50%) scale(0.92); 
-    opacity: 0.9;
-    backdrop-filter: blur(15px) saturate(160%);
-  }
-}
-
-/* 动画状态类 */
-.dynamic-island-player.expanding {
-  animation: expand 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.dynamic-island-player.collapsing {
-  animation: collapse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-/* 进度条活动状态 */
-.progress-container.active {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(6px);
-}
-
-.progress-container.active:hover {
-  height: 5px;
-  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* 移动端适配 */
@@ -665,8 +427,6 @@
     width: 300px;
     height: 120px; /* 减小高度 */
     padding: 0 15px 10px; /* 减小内边距 */
-    backdrop-filter: blur(15px) saturate(160%);
-    -webkit-backdrop-filter: blur(15px) saturate(160%);
   }
 
   .cover-art {
@@ -683,15 +443,10 @@
   .song-title {
     font-size: 14px;
     margin-bottom: 2px;
-    background: linear-gradient(90deg, #fff, #d0d0d0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 
   .artist {
     font-size: 12px;
-    color: #aaa;
   }
 
   .controls {
@@ -703,13 +458,11 @@
     width: 26px; /* 减小按钮尺寸 */
     height: 26px;
     padding: 3px;
-    backdrop-filter: blur(8px);
   }
 
   .play-pause {
     width: 30px;
     height: 30px;
-    backdrop-filter: blur(10px);
   }
 
   .control-btn svg {
@@ -724,7 +477,6 @@
 
   .progress-container {
     bottom: 25px; /* 上移进度条 */
-    backdrop-filter: blur(3px);
   }
 
   .time-display {
@@ -738,8 +490,6 @@
     max-width: 200px; /* 增加收缩状态宽度 */
     height: 32px;
     padding: 0 10px;
-    backdrop-filter: blur(12px) saturate(150%);
-    -webkit-backdrop-filter: blur(12px) saturate(150%);
   }
 
   .dynamic-island-player.collapsed .cover-art {
@@ -750,10 +500,6 @@
 
   .dynamic-island-player.collapsed .song-title {
     font-size: 12px;
-    background: linear-gradient(90deg, #fff, #c0c0c0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
 }
 
