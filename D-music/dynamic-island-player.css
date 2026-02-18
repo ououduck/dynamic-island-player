@@ -1,557 +1,298 @@
-/* 
-  灵动岛播放器主容器
-  位置：固定在页面顶部居中
-  样式：半透明黑色背景，圆角矩形
-  交互：支持展开/收缩动画
-*/
+
+/* =========================================
+   1. 核心容器 & 物理动画
+   ========================================= */
 .dynamic-island-player {
   position: fixed;
   top: 20px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 460px; /* 增加宽度 */
-  height: 140px; /* 增加高度 */
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 30px;
+  transform: translateX(-50%) translateZ(0); /* 开启 GPU 加速 */
+  
+  /* 尺寸与布局 */
+  width: 460px;
+  height: 140px;
+  padding: 0 24px 18px;
   display: flex;
   align-items: center;
-  padding: 0 20px 15px; /* 减小底部内边距 */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  
+  /* 视觉质感 - 升级为毛玻璃 */
+  background: rgba(20, 20, 20, 0.75); /*稍微降低不透明度以展示模糊 */
+  backdrop-filter: blur(35px) saturate(180%); /* 核心：高斯模糊+饱和度提升 */
+  -webkit-backdrop-filter: blur(35px) saturate(180%);
+  border-radius: 40px; /* 更圆润的角 */
+  
+  /* 边框与阴影 - 增加层次感 */
+  border: 1px solid rgba(255, 255, 255, 0.12); /* 细腻的内描边 */
+  box-shadow: 
+    0 10px 40px -10px rgba(0, 0, 0, 0.6), /* 扩散阴影 */
+    0 0 0 1px rgba(0, 0, 0, 0.1), /* 黑色轮廓 */
+    inset 0 1px 1px rgba(255, 255, 255, 0.15); /* 顶部高光 */
+
+  /* 动画物理引擎 - 模仿弹簧回弹 */
+  transition: 
+    width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), /* 宽度带回弹 */
+    height 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), /* 高度带回弹 */
+    border-radius 0.5s ease,
+    background 0.3s ease,
+    transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    
   z-index: 9999;
-  cursor: default; /* 移除指针样式 */
-  transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-  user-select: none; /* 禁止选中文本 */
-  -webkit-tap-highlight-color: transparent; /* 禁止移动端点击高亮 */
-  transform-origin: center top;
-  will-change: transform, width, height;
+  overflow: hidden; /* 确保内容不溢出圆角 */
+  will-change: width, height, transform;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
 }
 
-/* 
-  播放器收缩状态
-  样式：缩小尺寸，隐藏部分内容
-  交互：显示指针，支持悬停放大
-*/
+/* =========================================
+   2. 收缩状态 (Mini Mode)
+   ========================================= */
 .dynamic-island-player.collapsed {
-  width: 200px; /* 增加基础宽度 */
+  width: 140px; /* 更紧凑的胶囊形状 */
   height: 36px;
-  padding: 0 12px;
-  overflow: hidden;
-  transform: translateX(-50%) scale(0.92);
-  cursor: pointer; /* 收缩状态显示指针 */
-  transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+  padding: 0 6px;
+  border-radius: 20px;
+  background: #000; /* 收缩时变为纯黑，符合灵动岛特性 */
+  border-color: transparent;
+  cursor: pointer;
+  
+  /* 悬停时的微互动 */
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
 }
 
 .dynamic-island-player.collapsed:hover {
-  transform: translateX(-50%) scale(0.96);
+  transform: translateX(-50%) scale(1.03); /* 轻微放大 */
 }
 
+/* 收缩时的元素处理 */
 .dynamic-island-player.collapsed .cover-art {
-  width: 20px;
-  height: 20px;
-  margin: 6px;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px;
+  border-radius: 50%;
+  animation: none; /* 收缩时不旋转 */
 }
 
-.dynamic-island-player.collapsed .player-info {
-  margin: 0 6px;
-  overflow: hidden;
+/* 声音波纹动画 (新增推荐) - 仅在收缩时显示 */
+.dynamic-island-player.collapsed::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  background-image: url("data:image/svg+xml,..."); /* 建议这里放一个 SVG 波形图标 */
+  background-size: contain;
+  filter: invert(1);
+  opacity: 0.8;
 }
 
-.dynamic-island-player.collapsed .song-title {
-  font-size: 12px;
-  max-width: 160px; /* 增加歌名显示宽度 */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
+/* 收缩时隐藏多余元素，使用透明度过渡更自然 */
 .dynamic-island-player.collapsed .controls,
 .dynamic-island-player.collapsed .time-display,
 .dynamic-island-player.collapsed .progress-container,
 .dynamic-island-player.collapsed .artist {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute; /* 脱离文档流，避免挤压布局 */
 }
 
-/* 移除悬停放大效果 */
-.dynamic-island-player:hover {
-  transform: translateX(-50%);
+.dynamic-island-player.collapsed .song-title {
+  font-size: 13px;
+  max-width: 80px;
+  opacity: 0.9;
 }
 
-/* 收缩状态悬停效果 */
-.dynamic-island-player.collapsed:hover {
-  transform: translateX(-50%) scale(0.96);
-}
-
-.dynamic-island-player * {
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-/* 
-  专辑封面
-  样式：圆形，支持旋转动画
-  状态：播放时旋转，暂停时停止
-*/
+/* =========================================
+   3. 专辑封面 (带黑胶质感)
+   ========================================= */
 .cover-art {
-  width: 50px; /* 增加封面尺寸 */
-  height: 50px;
-  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px; /* 展开时建议用圆角矩形，更现代 */
   margin-right: 20px;
-  animation: rotate 6s linear infinite;
-  animation-play-state: paused;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  object-fit: cover;
+  transition: all 0.4s ease;
+  
+  /* 如果你坚持要圆形旋转，保留以下代码，否则建议去掉旋转 */
+  /* border-radius: 50%; */
+  /* animation: rotate 10s linear infinite; */
 }
 
-.cover-art.playing {
-  animation-play-state: running;
-}
-
-/* 
-  播放信息区域
-  包含：歌曲标题、艺术家
-  样式：白色文字，支持文本溢出处理
-*/
+/* =========================================
+   4. 播放信息
+   ========================================= */
 .player-info {
   flex: 1;
-  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 8px; /* 为进度条留空间 */
+  mask-image: linear-gradient(90deg, #000 85%, transparent 100%); /* 尾部渐变消失 */
 }
 
 .song-title {
-  font-size: 16px; /* 增加字体大小 */
-  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .artist {
-  font-size: 14px;
-  color: #aaa;
-  margin: 3px 0 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
 }
 
-/* 
-  控制按钮区域
-  包含：播放/暂停、上一首、下一首、播放列表按钮
-  样式：圆形按钮，支持悬停效果
-*/
+/* =========================================
+   5. 进度条 (高级流光效果)
+   ========================================= */
+.progress-container {
+  position: absolute;
+  bottom: 28px;
+  left: 24px;
+  right: 24px;
+  width: auto;
+  height: 20px; /* 增大热区，方便点击 */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+/* 进度条背景槽 */
+.progress-bg {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: height 0.2s ease, background 0.2s ease;
+}
+
+/* 激活的进度条 */
+.progress-bar {
+  height: 100%;
+  width: 30%; /* 测试宽度 */
+  border-radius: 10px;
+  position: relative;
+  
+  /* 动态渐变色 */
+  background: linear-gradient(90deg, #5e9eff, #9d7aff);
+  background-size: 200% 100%;
+  animation: gradientFlow 3s ease infinite;
+  
+  box-shadow: 0 0 10px rgba(94, 158, 255, 0.4); /* 发光效果 */
+}
+
+/* 进度条把手 (默认隐藏，悬停显示) */
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%) scale(0);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 悬停交互 */
+.progress-container:hover .progress-bg {
+  height: 8px; /* 悬停变粗 */
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.progress-container:hover .progress-bar::after {
+  transform: translateY(-50%) scale(1);
+}
+
+/* 时间显示 */
+.time-display {
+  position: absolute;
+  bottom: 8px;
+  width: 100%;
+  left: 0;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none; /* 防止遮挡点击 */
+}
+
+/* =========================================
+   6. 控制按钮 (磨砂质感)
+   ========================================= */
 .controls {
   display: flex;
   align-items: center;
-  gap: 16px; /* 增加按钮间距 */
+  gap: 20px;
+  margin-bottom: 8px;
 }
 
 .control-btn {
-  background: none;
+  background: transparent;
   border: none;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.1);
-  outline: none; /* 移除点击时的轮廓 */
+  position: relative;
+}
+
+.control-btn svg {
+  fill: currentColor;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 .control-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .control-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.92);
 }
 
-.control-btn:focus {
-  outline: none;
-}
-
+/* 播放按钮特殊样式 */
 .play-pause {
-  width: 45px; /* 增加主按钮尺寸 */
-  height: 45px;
-  font-size: 20px;
-}
-
-.prev, .next {
-  font-size: 14px;
-}
-
-.playlist-btn {
-  font-size: 16px;
-  opacity: 0.8;
-}
-
-/* 
-  进度条容器
-  样式：细长条，支持悬停变粗
-  交互：支持点击跳转和拖动
-*/
-.progress-container {
-  position: absolute;
-  bottom: 35px; /* 调整位置往上移 */
-  left: 20px;
-  width: calc(100% - 40px);
-  height: 3px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  overflow: visible;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 10;
-}
-
-.progress-container:hover {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.progress-bar {
-  position: relative;
-  height: 100%;
-  background: linear-gradient(90deg, #3498db, #2ecc71); /* 更改进度条颜色 */
-  width: 0%;
-  transition: width 0.1s linear;
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(46, 204, 113, 0.3); /* 添加发光效果 */
-}
-
-.progress-handle {
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  width: 8px;
-  height: 8px;
+  width: 44px;
+  height: 44px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-  transform: translate(0, -50%) scale(0);
-  transition: transform 0.2s ease;
+  color: #000; /* 反色图标 */
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
 }
 
-.progress-container:hover .progress-handle,
-.progress-container.dragging .progress-handle {
-  transform: translate(0, -50%) scale(1);
+.play-pause:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(255, 255, 255, 0.3);
 }
 
-.time-display {
-  position: absolute;
-  right: 15px;
-  bottom: 33px; /* 配合进度条位置调整 */
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
+.play-pause svg {
+  fill: #000;
+  width: 18px;
+  height: 18px;
+}
+
+/* =========================================
+   7. 关键帧动画
+   ========================================= */
+@keyframes gradientFlow {
+  0% { background-position: 100% 50%; }
+  50% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-/* 优化播放列表样式 */
-/* 
-  播放列表容器
-  位置：固定在播放器下方
-  样式：半透明背景，支持滚动
-  交互：支持显示/隐藏动画
-*/
-.playlist-container {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  width: 100%;
-  max-height: 300px;
-  background: rgba(0, 0, 0, 0.85);
-  border-radius: 16px;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  padding: 10px 0;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-.playlist-container.show {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.playlist-container::-webkit-scrollbar {
-  width: 4px;
-}
-
-.playlist-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.playlist-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-}
-
-.playlist-item {
-  padding: 12px 25px;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  transition: all 0.2s ease;
-  position: relative;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.playlist-item::after {
-  content: '';
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 0;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.playlist-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.playlist-item.active {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* 修改搜索框位置和样式 */
-/* 
-  搜索框
-  位置：固定在播放器下方
-  样式：圆角输入框，支持显示/隐藏动画
-  功能：用于搜索歌曲
-*/
-.search-box {
-  position: absolute;
-  top: calc(100% + 10px); /* 改为底部定位 */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  opacity: 0;
-  transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-  z-index: 100;
-}
-
-.search-box.show {
-  opacity: 1;
-}
-
-.search-input {
-  width: 100%;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  font-size: 14px;
-  outline: none;
-}
-
-/* 搜索结果列表样式 */
-.search-results {
-  position: absolute;
-  top: calc(100% + 45px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
-  max-height: 300px;
-  background: rgba(0, 0, 0, 0.9);
-  border-radius: 12px;
-  overflow-y: auto;
-  display: none;
-  z-index: 101;
-  padding: 8px 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.search-results.show {
-  display: block;
-}
-
-.search-result-item {
-  padding: 10px 15px;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.search-result-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.search-result-title {
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.search-result-artist {
-  font-size: 12px;
-  color: #999;
-}
-
-.no-results {
-  padding: 20px;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
-}
-
-/* 动画优化 */
-.dynamic-island-player,
-.dynamic-island-player * {
-  transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-/* 移动端适配 */
-/* 
-  移动端适配 - 平板和手机
-  调整：播放器尺寸、按钮大小、布局间距
-  优化：触摸屏交互体验
-*/
-@media (max-width: 768px) {
-  .dynamic-island-player {
-    width: 300px;
-    height: 120px; /* 减小高度 */
-    padding: 0 15px 10px; /* 减小内边距 */
-  }
-
-  .cover-art {
-    width: 42px; /* 调整封面大小 */
-    height: 42px;
-    margin-right: 12px; /* 减小右边距 */
-  }
-
-  .player-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .song-title {
-    font-size: 14px;
-    margin-bottom: 2px;
-  }
-
-  .artist {
-    font-size: 12px;
-  }
-
-  .controls {
-    gap: 6px; /* 减小按钮间距 */
-    margin-left: 8px;
-  }
-
-  .control-btn {
-    width: 26px; /* 减小按钮尺寸 */
-    height: 26px;
-    padding: 3px;
-  }
-
-  .play-pause {
-    width: 30px;
-    height: 30px;
-  }
-
-  .control-btn svg {
-    width: 11px; /* 缩小图标 */
-    height: 11px;
-  }
-
-  .play-pause svg {
-    width: 13px;
-    height: 13px;
-  }
-
-  .progress-container {
-    bottom: 25px; /* 上移进度条 */
-  }
-
-  .time-display {
-    bottom: 23px;
-    font-size: 9px;
-  }
-
-  /* 收缩状态优化 */
-  .dynamic-island-player.collapsed {
-    width: calc(100% - 30px);
-    max-width: 200px; /* 增加收缩状态宽度 */
-    height: 32px;
-    padding: 0 10px;
-  }
-
-  .dynamic-island-player.collapsed .cover-art {
-    width: 22px;
-    height: 22px;
-    margin: 5px;
-  }
-
-  .dynamic-island-player.collapsed .song-title {
-    font-size: 12px;
-  }
-}
-
-/* 超小屏幕优化 */
-/* 
-  移动端适配 - 小屏幕手机
-  进一步优化：缩小所有元素尺寸
-  确保在小屏幕上保持良好的可用性
-*/
-@media (max-width: 320px) {
-  .dynamic-island-player {
-    width: 280px;
-    height: 110px;
-    padding: 0 12px 8px;
-  }
-
-  .control-btn {
-    width: 24px;
-    height: 24px;
-  }
-
-  .play-pause {
-    width: 28px;
-    height: 28px;
-  }
-
-  .progress-container {
-    bottom: 22px;
-  }
-
-  .time-display {
-    bottom: 20px;
-  }
-}
-
-/* 触摸屏优化 */
-/* 
-  触摸屏设备优化
-  移除：悬停效果
-  优化：触摸交互体验
-*/
-@media (hover: none) {
-  .dynamic-island-player:hover {
-    transform: translateX(-50%);
-  }
-
-  .control-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: none;
-  }
-
-  .progress-container:hover {
-    height: 4px;
-  }
 }
