@@ -377,22 +377,57 @@ class DynamicIslandPlayer {
 
   /**
    * 切换播放器的展开/收缩状态
+   * 优化动画效果，使用更流畅的贝塞尔曲线
    */
   toggleCollapse() {
     this.isCollapsed = !this.isCollapsed;
+    
+    // 添加动画类
+    if (this.isCollapsed) {
+      this.container.classList.add('collapsing');
+    } else {
+      this.container.classList.add('expanding');
+    }
+    
     requestAnimationFrame(() => {
-      this.container.style.transition = 'all 0.4s cubic-bezier(0.32, 0.72, 0, 1)';
+      this.container.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
       this.container.classList.toggle('collapsed', this.isCollapsed);
+      
+      // 动画结束后移除动画类
+      setTimeout(() => {
+        this.container.classList.remove('collapsing', 'expanding');
+      }, 500);
     });
   }
 
   /**
    * 更新播放进度条
    * @param {number} percent - 当前播放进度百分比
+   * 优化动画效果，使用更流畅的过渡
    */
   updateProgress(percent) {
     const progressBar = this.container.querySelector('.progress-bar');
-    progressBar.style.width = `${percent}%`;
+    const progressContainer = this.container.querySelector('.progress-container');
+    
+    // 添加拖动状态类
+    if (percent > 0 && percent < 100) {
+      progressContainer.classList.add('active');
+    } else {
+      progressContainer.classList.remove('active');
+    }
+    
+    // 使用requestAnimationFrame确保流畅动画
+    requestAnimationFrame(() => {
+      progressBar.style.width = `${percent}%`;
+      
+      // 添加进度条动画效果
+      if (percent > 0 && percent < 100) {
+        progressBar.style.animation = 'none';
+        setTimeout(() => {
+          progressBar.style.animation = '';
+        }, 10);
+      }
+    });
   }
 
   /**
