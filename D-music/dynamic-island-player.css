@@ -15,11 +15,11 @@
   /* 展开态高度由纵向变量推导：
      pad-top + cover + row-gap + progress-row + row-gap + controls-h + pad-bottom = height */
   --di-width: 412px;
-  --di-height: 128px;
-  --di-width-collapsed: 252px;
+  --di-height: 134px;
+  --di-width-collapsed: 210px;
   --di-height-collapsed: 36px;
   --di-top: 12px;
-  --di-radius: 44px;
+  --di-radius: 34px;
   --di-gap: 12px; /* 第一行内部的横向间距 */
   --di-gap-collapsed: 9px;
   --di-row-gap: 6px; /* 行与行之间的纵向间距 */
@@ -44,7 +44,7 @@
   --di-time-w: 44px;
   --di-cover: 46px;
   --di-cover-radius: calc(var(--di-cover) * 0.26);
-  --di-controls-h: 30px;
+  --di-controls-h: 36px;
   --di-btn-gap: 30px; /* 三个按钮的间距 */
 
   /* 固定在视口顶部居中，紧贴顶边——灵动岛是「屏幕挖孔」，不是浮层卡片。
@@ -221,8 +221,8 @@
 .control-btn {
   position: relative;
   flex: 0 0 auto;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   display: flex;
   align-items: center;
@@ -236,7 +236,7 @@
   transition: opacity 0.2s ease, transform 0.28s var(--di-ease);
 }
 
-/* 透明外扩热区：图标只有 24px，触摸/鼠标也能落在 40px 的目标上 */
+/* 透明外扩热区：图标只有 28px，触摸/鼠标也能落在 44px 的目标上 */
 .control-btn::before {
   content: "";
   position: absolute;
@@ -245,8 +245,8 @@
 
 .control-btn svg {
   display: block;
-  width: 19px;
-  height: 19px;
+  width: 23px;
+  height: 23px;
 }
 
 .control-btn:hover {
@@ -268,17 +268,17 @@
 
 .play-pause {
   z-index: 2; /* 外扩热区优先于相邻按钮，播放键最容易点中 */
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   opacity: 1;
 }
 
 .play-pause svg {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
 }
 
-.prev svg, .next svg { width: 22px; height: 22px; }
+.prev svg, .next svg { width: 26px; height: 26px; }
 .search-btn svg { width: 18px; height: 18px; }
 /* 搜索键在第一行最右，收合时要连宽度一起收掉，才能留出一条干净的胶囊 */
 .search-btn {
@@ -593,68 +593,70 @@
 }
 
 /* ==========================================================================
-   响应式：窄屏上岛宽跟随视口，与真机上「岛几乎占满刘海区」的比例一致
-   只覆盖顶部变量，其余尺寸自动继承
+   响应式：窄屏不让岛铺满两端——横向内缩、纵向拉高，比例才接近真机的展开态
    ========================================================================== */
-/* 圆角是苹果的绝对值（44pt），不随岛的大小缩放 */
 @media (max-width: 768px) {
   .dynamic-island-player {
-    --di-width: calc(100vw - 24px);
-    --di-height: 110px;
-    --di-width-collapsed: min(214px, calc(100vw - 150px));
+    --di-width: calc(100vw - 56px);
+    --di-height: 117px;
+    --di-width-collapsed: min(212px, calc(100vw - 150px));
     --di-top: 6px;
+    --di-radius: 32px;
     --di-gap: 11px;
     --di-gap-collapsed: 8px;
     --di-row-gap: 5px;
-    --di-inset: 18px;
-    --di-pad-top: 11px;
-    --di-pad-bottom: 11px;
-    --di-progress-row: 10px;
+    --di-inset: 20px;
+    --di-pad-top: 9px;
+    --di-pad-bottom: 9px;
+    --di-progress-row: 11px;
     --di-time-w: 40px;
-    --di-cover: 40px;
-    --di-controls-h: 28px;
-    --di-btn-gap: 26px;
+    --di-cover: 44px;
+    --di-controls-h: 34px;
+    --di-btn-gap: 28px;
     --di-eq-h: 13px;
   }
 
   .song-title { font-size: 16px; }
   .artist { font-size: 12.5px; height: 16px; line-height: 16px; }
-  .control-btn { width: 22px; height: 22px; }
-  .control-btn svg { width: 18px; height: 18px; }
-  .play-pause { width: 28px; height: 28px; }
-  .play-pause svg { width: 25px; height: 25px; }
-  .prev svg, .next svg { width: 20px; height: 20px; }
+  .control-btn { width: 30px; height: 30px; }
+  .control-btn svg { width: 26px; height: 26px; }
+  .play-pause { width: 34px; height: 34px; }
+  .play-pause svg { width: 32px; height: 32px; }
+  .prev svg, .next svg { width: 28px; height: 28px; }
+  .search-btn svg { width: 22px; height: 22px; }
 
-  .dynamic-island-player.collapsed { --di-cover: 19px; padding: 0 11px; }
+  .dynamic-island-player.collapsed { --di-cover: 18px; padding: 0 11px; }
 }
 
-/* 手机：岛几乎占满刘海区，但保持同一套圆角与纵向节奏 */
+/* 手机：两侧各留 32px，纵向比桌面略紧但不塌成一条 */
 @media (max-width: 420px) {
   .dynamic-island-player {
-    --di-width: calc(100vw - 18px);
-    --di-height: 102px;
-    --di-width-collapsed: min(206px, calc(100vw - 150px));
+    --di-width: calc(100vw - 64px);
+    --di-height: 112px;
+    --di-width-collapsed: min(200px, calc(100vw - 150px));
     --di-top: 4px;
+    --di-radius: 32px;
     --di-gap: 10px;
-    --di-row-gap: 4px;
-    --di-inset: 18px;
-    --di-pad-top: 10px;
-    --di-pad-bottom: 10px;
+    --di-row-gap: 5px;
+    --di-inset: 20px;
+    --di-pad-top: 9px;
+    --di-pad-bottom: 9px;
     --di-progress-row: 10px;
-    --di-time-w: 36px;
-    --di-cover: 38px;
-    --di-controls-h: 26px;
-    --di-btn-gap: 22px;
+    --di-time-w: 38px;
+    --di-cover: 42px;
+    --di-controls-h: 32px;
+    --di-btn-gap: 26px;
     --di-eq-h: 12px;
   }
 
   .song-title { font-size: 16px; }
-  .artist { font-size: 12px; height: 15px; line-height: 15px; }
-  .control-btn { width: 20px; height: 20px; }
-  .control-btn svg { width: 16px; height: 16px; }
-  .play-pause { width: 26px; height: 26px; }
-  .play-pause svg { width: 23px; height: 23px; }
-  .prev svg, .next svg { width: 18px; height: 18px; }
+  .artist { font-size: 13px; height: 15px; line-height: 15px; }
+  .control-btn { width: 28px; height: 28px; }
+  .control-btn svg { width: 24px; height: 24px; }
+  .play-pause { width: 32px; height: 32px; }
+  .play-pause svg { width: 30px; height: 30px; }
+  .prev svg, .next svg { width: 26px; height: 26px; }
+  .search-btn svg { width: 20px; height: 20px; }
   .progress-row span { font-size: 9.5px; }
 
   /* 16px 字号可阻止 iOS Safari 聚焦输入框时自动放大整页 */
@@ -662,28 +664,35 @@
   .search-result-item { padding: 8px 9px; }
   .search-result-cover { width: 34px; height: 34px; }
 
-  .dynamic-island-player.collapsed { --di-cover: 18px; padding: 0 10px; }
+  .dynamic-island-player.collapsed { --di-cover: 17px; padding: 0 10px; }
 }
 
 @media (max-width: 320px) {
   .dynamic-island-player {
-    --di-width: calc(100vw - 12px);
-    --di-height: 98px;
-    --di-width-collapsed: min(176px, calc(100vw - 60px));
-    --di-radius: 40px;
+    --di-width: calc(100vw - 40px);
+    --di-height: 102px;
+    --di-width-collapsed: min(176px, calc(100vw - 40px));
+    --di-radius: 28px;
     --di-row-gap: 4px;
     --di-inset: 16px;
-    --di-pad-top: 10px;
-    --di-pad-bottom: 10px;
+    --di-pad-top: 8px;
+    --di-pad-bottom: 8px;
+    --di-progress-row: 10px;
     --di-time-w: 34px;
-    --di-cover: 34px;
-    --di-controls-h: 24px;
-    --di-btn-gap: 18px;
+    --di-cover: 38px;
+    --di-controls-h: 30px;
+    --di-btn-gap: 20px;
+    --di-eq-h: 11px;
   }
 
   .song-title { font-size: 15px; }
-  .play-pause { width: 24px; height: 24px; }
-  .play-pause svg { width: 21px; height: 21px; }
+  .artist { font-size: 12.5px; height: 14px; line-height: 14px; }
+  .control-btn { width: 26px; height: 26px; }
+  .control-btn svg { width: 22px; height: 22px; }
+  .play-pause { width: 30px; height: 30px; }
+  .play-pause svg { width: 28px; height: 28px; }
+  .prev svg, .next svg { width: 24px; height: 24px; }
+  .search-btn svg { width: 18px; height: 18px; }
 }
 
 /* 触摸设备：去掉 hover 残留、放大点击热区 */
