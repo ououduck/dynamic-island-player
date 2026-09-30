@@ -46,7 +46,7 @@ class DynamicIslandPlayer {
           <p class="artist">未知歌手</p>
         </div>
         <div class="live-activity" aria-hidden="true">
-          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
         </div>
         <button class="control-btn search-btn" type="button" aria-label="搜索歌曲" title="搜索">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
@@ -54,6 +54,15 @@ class DynamicIslandPlayer {
             <path d="M15.4 15.4 20 20"/>
           </svg>
         </button>
+      </div>
+      <div class="progress-row" aria-hidden="true">
+        <span class="time-current">00:00</span>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-handle"></div>
+          </div>
+        </div>
+        <span class="time-remaining">--:--</span>
       </div>
       <div class="controls">
         <button class="control-btn prev" type="button" aria-label="上一首" title="上一首">
@@ -77,15 +86,6 @@ class DynamicIslandPlayer {
             <path d="M20 12 11.6 6.6v10.8z"/>
           </svg>
         </button>
-      </div>
-      <div class="progress-container" aria-hidden="true">
-        <div class="progress-bar">
-          <div class="progress-handle"></div>
-        </div>
-      </div>
-      <div class="time-display" aria-hidden="true">
-        <span class="time-current">00:00</span>
-        <span class="time-remaining">--:--</span>
       </div>
     `;
 

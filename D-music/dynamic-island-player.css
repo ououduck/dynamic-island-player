@@ -12,16 +12,18 @@
 
 .dynamic-island-player {
   /* —— 尺寸与节奏 —— */
-  --di-width: 440px;
-  --di-height: 154px;
+  /* 展开态高度由纵向变量推导：
+     pad-top + cover + row-gap + progress-row + row-gap + controls-h + pad-bottom = height */
+  --di-width: 412px;
+  --di-height: 128px;
   --di-width-collapsed: 252px;
   --di-height-collapsed: 36px;
   --di-top: 12px;
-  --di-radius: 34px;
+  --di-radius: 44px;
   --di-gap: 12px; /* 第一行内部的横向间距 */
   --di-gap-collapsed: 9px;
-  --di-row-gap: 14px; /* 两行之间的纵向间距 */
-  --di-duration: 0.5s;
+  --di-row-gap: 6px; /* 行与行之间的纵向间距 */
+  --di-duration: 0.42s;
   --di-ease: cubic-bezier(0.32, 0.72, 0, 1); /* iOS 形变同款缓动 */
 
   /* —— 材质与文字 —— */
@@ -34,18 +36,21 @@
   --di-hairline: rgba(255, 255, 255, 0.08);
   --di-shadow: 0 14px 40px -16px rgba(0, 0, 0, 0.75);
   --di-progress-h: 3px;
-  --di-eq-h: 16px;
-  --di-inset: 20px;
-  --di-pad-top: 18px;
-  --di-pad-bottom: 26px;
-  --di-bar-bottom: 13px;
-  --di-time-w: 46px;
-  --di-cover: 54px;
-  --di-controls-h: 42px;
+  --di-progress-row: 12px;
+  --di-eq-h: 15px;
+  --di-inset: 22px;
+  --di-pad-top: 14px;
+  --di-pad-bottom: 14px;
+  --di-time-w: 44px;
+  --di-cover: 46px;
+  --di-cover-radius: calc(var(--di-cover) * 0.26);
+  --di-controls-h: 30px;
+  --di-btn-gap: 30px; /* 三个按钮的间距 */
 
-  /* 固定于视口顶部居中；用 margin 居中，把 transform 完整留给形变动画 */
+  /* 固定在视口顶部居中，紧贴顶边——灵动岛是「屏幕挖孔」，不是浮层卡片。
+     需要避让刘海时改 --di-top 即可 */
   position: fixed;
-  top: max(var(--di-top), env(safe-area-inset-top));
+  top: var(--di-top);
   left: 0;
   right: 0;
   margin-inline: auto;
@@ -53,7 +58,7 @@
   max-width: calc(100% - 16px);
   height: var(--di-height);
   padding: var(--di-pad-top) var(--di-inset) var(--di-pad-bottom);
-  /* 苹果的双层结构：上行「封面 + 歌名」，下行「三个按钮」，进度条贴底 */
+  /* 苹果的三段结构：「封面 + 歌名」/「进度读数 + 轨道」/「三个按钮」 */
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -107,24 +112,19 @@
   transition: gap var(--di-duration) var(--di-ease);
 }
 
-/* --- 专辑封面：圆形唱片，播放时旋转（沿用 @keyframes rotate） --- */
+/* --- 专辑封面：苹果用连续曲率的圆角方块，且在形变中只是缩放、不会变成圆形 --- */
 .cover-art {
   flex: 0 0 auto;
   width: var(--di-cover);
   height: var(--di-cover);
-  border-radius: 50%;
+  border-radius: var(--di-cover-radius);
   object-fit: cover;
   background: #17171a;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 4px 14px rgba(0, 0, 0, 0.45);
-  animation: rotate 6s linear infinite;
-  animation-play-state: paused;
   transition: width var(--di-duration) var(--di-ease),
     height var(--di-duration) var(--di-ease),
+    border-radius var(--di-duration) var(--di-ease),
     box-shadow var(--di-duration) var(--di-ease);
-}
-
-.cover-art.playing {
-  animation-play-state: running;
 }
 
 /* --- 歌曲信息 --- */
@@ -161,39 +161,36 @@
     margin var(--di-duration) var(--di-ease), opacity 0.22s ease;
 }
 
-/* --- Live Activity 波形：收缩态下表示「正在播放」，苹果实时活动的典型形态 --- */
+/* --- Live Activity 波形：苹果在展开态与收缩态都保留这组声波指示 --- */
 .live-activity {
   flex: 0 0 auto;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
-  gap: calc(var(--di-eq-h) * 0.1875);
+  gap: calc(var(--di-eq-h) * 0.15);
   height: var(--di-eq-h);
-  width: 0;
+  width: calc(var(--di-eq-h) * 1.85);
   margin-left: auto;
-  /* 展开态宽度收为 0，用负外边距抵消它仍然占据的那一段 gap */
-  margin-right: calc(var(--di-gap) * -1);
-  opacity: 0;
+  opacity: 0.82;
   overflow: hidden;
   transition: width var(--di-duration) var(--di-ease),
     height var(--di-duration) var(--di-ease),
-    margin-right var(--di-duration) var(--di-ease),
     opacity 0.24s ease;
 }
 
 /* 全部尺寸由 --di-eq-h 推导，收缩态与窄屏只需改一个变量 */
 .live-activity span {
-  width: calc(var(--di-eq-h) * 0.1875);
+  width: calc(var(--di-eq-h) * 0.25);
   border-radius: 999px;
   background: var(--di-fill);
   transform-origin: bottom;
-  transform: scaleY(0.45);
 }
 
 .live-activity span:nth-child(1) { height: calc(var(--di-eq-h) * 0.5625); }
 .live-activity span:nth-child(2) { height: calc(var(--di-eq-h) * 0.875); }
-.live-activity span:nth-child(3) { height: calc(var(--di-eq-h) * 0.4375); }
+.live-activity span:nth-child(3) { height: var(--di-eq-h); }
 .live-activity span:nth-child(4) { height: calc(var(--di-eq-h) * 0.75); }
+.live-activity span:nth-child(5) { height: calc(var(--di-eq-h) * 0.4375); }
 
 .dynamic-island-player.playing .live-activity span {
   animation: di-wave 1.1s var(--di-ease) infinite alternate;
@@ -204,16 +201,17 @@
 .dynamic-island-player.playing .live-activity span:nth-child(2) { animation-duration: 1.25s; animation-delay: 0.18s; }
 .dynamic-island-player.playing .live-activity span:nth-child(3) { animation-duration: 0.8s; animation-delay: 0.36s; }
 .dynamic-island-player.playing .live-activity span:nth-child(4) { animation-duration: 1.1s; animation-delay: 0.54s; }
+.dynamic-island-player.playing .live-activity span:nth-child(5) { animation-duration: 0.88s; animation-delay: 0.72s; }
 
 /* --- 控制按钮：苹果只在岛上放裸图标，不加圆形底板 --- */
-/* 第二行：三个按钮居中，收合时整行高度归零、图标向内缩 */
+/* 末行：三个按钮居中，收合时整行高度归零、图标向内缩 */
 .controls {
   flex: 0 0 auto;
   height: var(--di-controls-h);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: var(--di-btn-gap);
   transition: height var(--di-duration) var(--di-ease),
     gap var(--di-duration) var(--di-ease),
     opacity 0.16s ease,
@@ -223,8 +221,8 @@
 .control-btn {
   position: relative;
   flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   display: flex;
   align-items: center;
@@ -232,13 +230,13 @@
   border: none;
   background: none;
   color: var(--di-text);
-  opacity: 0.68;
+  opacity: 0.82;
   cursor: pointer;
   outline: none;
   transition: opacity 0.2s ease, transform 0.28s var(--di-ease);
 }
 
-/* 透明外扩热区：图标只有 26px，触摸/鼠标也能落在 42px 的目标上 */
+/* 透明外扩热区：图标只有 24px，触摸/鼠标也能落在 40px 的目标上 */
 .control-btn::before {
   content: "";
   position: absolute;
@@ -247,8 +245,8 @@
 
 .control-btn svg {
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
 }
 
 .control-btn:hover {
@@ -270,53 +268,71 @@
 
 .play-pause {
   z-index: 2; /* 外扩热区优先于相邻按钮，播放键最容易点中 */
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   opacity: 1;
 }
 
 .play-pause svg {
-  width: 30px;
-  height: 30px;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+  width: 28px;
+  height: 28px;
 }
 
-.prev svg, .next svg { width: 21px; height: 21px; }
-.search-btn svg { width: 19px; height: 19px; }
+.prev svg, .next svg { width: 22px; height: 22px; }
+.search-btn svg { width: 18px; height: 18px; }
 /* 搜索键在第一行最右，收合时要连宽度一起收掉，才能留出一条干净的胶囊 */
 .search-btn {
-  opacity: 0.5;
+  opacity: 0.46;
   transition: opacity 0.2s ease,
     transform 0.28s var(--di-ease),
     width var(--di-duration) var(--di-ease),
     margin var(--di-duration) var(--di-ease);
 }
 
-/* --- 进度条：iOS 式发丝轨道 + 纯白填充（不用渐变与发光） --- */
-/* 读数分居两侧、与轨道同处一行，轨道被两端时间让出 --di-time-w */
+/* --- 进度行：读数分居两侧、与轨道同处一行；苹果把它排在按钮之上 --- */
+.progress-row {
+  flex: 0 0 auto;
+  height: var(--di-progress-row);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: height var(--di-duration) var(--di-ease),
+    opacity 0.22s ease;
+}
+
+.progress-row span {
+  flex: 0 0 auto;
+  min-width: var(--di-time-w);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--di-text-faint);
+}
+
+.time-current { text-align: left; }
+.time-remaining { text-align: right; }
+
+/* iOS 式发丝轨道 + 纯白填充（不用渐变与发光） */
 .progress-container {
-  position: absolute;
-  left: calc(var(--di-inset) + var(--di-time-w));
-  right: calc(var(--di-inset) + var(--di-time-w));
-  bottom: var(--di-bar-bottom);
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
   height: var(--di-progress-h);
   display: flex;
   align-items: center;
   background: var(--di-track);
   border-radius: 999px;
   cursor: pointer;
-  transition: height 0.2s var(--di-ease),
-    bottom var(--di-duration) var(--di-ease),
-    left var(--di-duration) var(--di-ease),
-    right var(--di-duration) var(--di-ease),
-    background 0.2s ease, opacity 0.22s ease;
+  transition: height 0.2s var(--di-ease), background 0.2s ease;
 }
 
 /* 扩大的透明热区，细进度条也能轻松点中 */
 .progress-container::before {
   content: "";
   position: absolute;
-  inset: -9px -4px;
+  inset: -6px -4px;
 }
 
 .progress-container:hover {
@@ -356,25 +372,6 @@
   height: 5px;
 }
 
-/* 读数：左侧已播放、右侧剩余，与轨道居同一行 */
-.time-display {
-  position: absolute;
-  left: var(--di-inset);
-  right: var(--di-inset);
-  bottom: var(--di-bar-bottom);
-  height: var(--di-progress-h);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  font-variant-numeric: tabular-nums;
-  color: var(--di-text-faint);
-  transition: opacity 0.22s ease, bottom var(--di-duration) var(--di-ease);
-}
-
 /* ==========================================================================
    收缩态（最小形态）
    不使用 display:none，改用宽度/透明度收合，形变过程内容连续「unfold」
@@ -385,6 +382,7 @@
   --di-row-gap: 0;
   --di-cover: 20px;
   --di-controls-h: 0;
+  --di-progress-row: 0;
   width: var(--di-width-collapsed);
   height: var(--di-height-collapsed);
   padding: 0 12px;
@@ -410,9 +408,7 @@
 }
 
 .collapsed .live-activity {
-  width: calc(var(--di-eq-h) * 1.3125);
-  margin-right: 0;
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 /* 收合：按钮整行消失，只留第一行的封面与歌名 */
@@ -429,16 +425,8 @@
   pointer-events: none;
 }
 
-/* 收合时进度条向中心并拢并淡出，形变更连贯 */
-.collapsed .progress-container {
-  left: 50%;
-  right: 50%;
-  bottom: 6px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.collapsed .time-display {
+/* 收合：进度整行高度归零并淡出，只留第一行的封面与歌名 */
+.collapsed .progress-row {
   opacity: 0;
   pointer-events: none;
 }
@@ -594,11 +582,6 @@
 /* ==========================================================================
    动画
    ========================================================================== */
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 @keyframes di-wave {
   from { transform: scaleY(0.3); opacity: 0.6; }
   to { transform: scaleY(1); opacity: 1; }
@@ -613,99 +596,103 @@
    响应式：窄屏上岛宽跟随视口，与真机上「岛几乎占满刘海区」的比例一致
    只覆盖顶部变量，其余尺寸自动继承
    ========================================================================== */
+/* 圆角是苹果的绝对值（44pt），不随岛的大小缩放 */
 @media (max-width: 768px) {
   .dynamic-island-player {
-    --di-width: calc(100vw - 28px);
-    --di-height: 146px;
-    --di-width-collapsed: min(240px, calc(100vw - 120px));
-    --di-radius: 32px;
-    --di-top: 10px;
+    --di-width: calc(100vw - 24px);
+    --di-height: 110px;
+    --di-width-collapsed: min(214px, calc(100vw - 150px));
+    --di-top: 6px;
     --di-gap: 11px;
     --di-gap-collapsed: 8px;
-    --di-row-gap: 12px;
-    --di-inset: 16px;
-    --di-pad-top: 16px;
-    --di-pad-bottom: 24px;
-    --di-bar-bottom: 12px;
-    --di-time-w: 43px;
-    --di-cover: 50px;
-    --di-controls-h: 38px;
+    --di-row-gap: 5px;
+    --di-inset: 18px;
+    --di-pad-top: 11px;
+    --di-pad-bottom: 11px;
+    --di-progress-row: 10px;
+    --di-time-w: 40px;
+    --di-cover: 40px;
+    --di-controls-h: 28px;
+    --di-btn-gap: 26px;
+    --di-eq-h: 13px;
   }
 
   .song-title { font-size: 16px; }
-  .artist { font-size: 12px; height: 16px; line-height: 16px; }
-  .controls { gap: 18px; }
-  .control-btn { width: 24px; height: 24px; }
+  .artist { font-size: 12.5px; height: 16px; line-height: 16px; }
+  .control-btn { width: 22px; height: 22px; }
   .control-btn svg { width: 18px; height: 18px; }
-  .play-pause { width: 36px; height: 36px; }
-  .play-pause svg { width: 26px; height: 26px; }
-  .prev svg, .next svg { width: 19px; height: 19px; }
+  .play-pause { width: 28px; height: 28px; }
+  .play-pause svg { width: 25px; height: 25px; }
+  .prev svg, .next svg { width: 20px; height: 20px; }
 
   .dynamic-island-player.collapsed { --di-cover: 19px; padding: 0 11px; }
 }
 
-/* 手机：优先保证歌名可读，收紧封面与按钮行把宽度让给文字 */
+/* 手机：岛几乎占满刘海区，但保持同一套圆角与纵向节奏 */
 @media (max-width: 420px) {
   .dynamic-island-player {
-    --di-width: calc(100vw - 20px);
-    --di-height: 124px;
-    --di-width-collapsed: min(184px, calc(100vw - 96px));
-    --di-radius: 30px;
-    --di-top: 8px;
+    --di-width: calc(100vw - 18px);
+    --di-height: 102px;
+    --di-width-collapsed: min(206px, calc(100vw - 150px));
+    --di-top: 4px;
     --di-gap: 10px;
-    --di-row-gap: 10px;
-    --di-inset: 14px;
-    --di-pad-top: 13px;
-    --di-pad-bottom: 21px;
-    --di-bar-bottom: 10px;
-    --di-time-w: 40px;
-    --di-cover: 42px;
-    --di-controls-h: 33px;
+    --di-row-gap: 4px;
+    --di-inset: 18px;
+    --di-pad-top: 10px;
+    --di-pad-bottom: 10px;
+    --di-progress-row: 10px;
+    --di-time-w: 36px;
+    --di-cover: 38px;
+    --di-controls-h: 26px;
+    --di-btn-gap: 22px;
+    --di-eq-h: 12px;
   }
 
-  .song-title { font-size: 15px; }
-  .controls { gap: 16px; }
-  .control-btn { width: 22px; height: 22px; }
-  .control-btn svg { width: 17px; height: 17px; }
-  .play-pause { width: 32px; height: 32px; }
+  .song-title { font-size: 16px; }
+  .artist { font-size: 12px; height: 15px; line-height: 15px; }
+  .control-btn { width: 20px; height: 20px; }
+  .control-btn svg { width: 16px; height: 16px; }
+  .play-pause { width: 26px; height: 26px; }
   .play-pause svg { width: 23px; height: 23px; }
+  .prev svg, .next svg { width: 18px; height: 18px; }
+  .progress-row span { font-size: 9.5px; }
 
   /* 16px 字号可阻止 iOS Safari 聚焦输入框时自动放大整页 */
   .search-input { font-size: 16px; padding: 12px 14px; }
   .search-result-item { padding: 8px 9px; }
   .search-result-cover { width: 34px; height: 34px; }
 
-  .dynamic-island-player.collapsed { --di-cover: 17px; padding: 0 10px; }
+  .dynamic-island-player.collapsed { --di-cover: 18px; padding: 0 10px; }
 }
 
 @media (max-width: 320px) {
   .dynamic-island-player {
-    --di-width: calc(100vw - 14px);
-    --di-height: 114px;
-    --di-width-collapsed: min(164px, calc(100vw - 76px));
-    --di-radius: 28px;
-    --di-row-gap: 9px;
-    --di-inset: 12px;
-    --di-pad-top: 12px;
-    --di-pad-bottom: 19px;
-    --di-bar-bottom: 9px;
-    --di-time-w: 37px;
-    --di-cover: 38px;
-    --di-controls-h: 31px;
+    --di-width: calc(100vw - 12px);
+    --di-height: 98px;
+    --di-width-collapsed: min(176px, calc(100vw - 60px));
+    --di-radius: 40px;
+    --di-row-gap: 4px;
+    --di-inset: 16px;
+    --di-pad-top: 10px;
+    --di-pad-bottom: 10px;
+    --di-time-w: 34px;
+    --di-cover: 34px;
+    --di-controls-h: 24px;
+    --di-btn-gap: 18px;
   }
 
-  .song-title { font-size: 14px; }
-  .controls { gap: 14px; }
-  .play-pause { width: 30px; height: 30px; }
+  .song-title { font-size: 15px; }
+  .play-pause { width: 24px; height: 24px; }
+  .play-pause svg { width: 21px; height: 21px; }
 }
 
 /* 触摸设备：去掉 hover 残留、放大点击热区 */
 @media (hover: none) {
   .dynamic-island-player.collapsed:hover { transform: none; }
   .control-btn::before { inset: -10px; }
-  .control-btn:hover { opacity: 0.68; transform: none; }
+  .control-btn:hover { opacity: 0.82; transform: none; }
   .play-pause:hover { opacity: 1; }
-  .search-btn:hover { opacity: 0.5; }
+  .search-btn:hover { opacity: 0.46; }
   .control-btn:active { opacity: 1; transform: scale(0.9); }
   .progress-container:hover { height: var(--di-progress-h); background: var(--di-track); }
   .progress-container:hover .progress-handle { transform: translate(0, -50%) scale(0); }
@@ -721,6 +708,4 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-
-  .cover-art { animation: none; }
 }
