@@ -36,7 +36,7 @@ class DynamicIslandPlayer {
     
     this.container.innerHTML = `
       <div class="search-box">
-        <input type="text" class="search-input" placeholder="搜索歌曲...">
+        <input type="text" class="search-input" placeholder="搜索歌曲、歌手…">
         <div class="search-results"></div>
       </div>
       <img class="cover-art" src="" alt="封面">
@@ -44,37 +44,47 @@ class DynamicIslandPlayer {
         <p class="song-title">未播放</p>
         <p class="artist">未知歌手</p>
       </div>
+      <div class="live-activity" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
       <div class="controls">
-        <button class="control-btn prev">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+        <button class="control-btn prev" type="button" aria-label="上一首" title="上一首">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M11.6 12 20 6.6v10.8z"/>
+            <path d="M4 12 12.4 6.6v10.8z"/>
           </svg>
         </button>
-        <button class="control-btn play-pause">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="play-icon">
-            <path d="M8 5v14l11-7z"/>
+        <button class="control-btn play-pause" type="button" aria-label="播放/暂停" title="播放 / 暂停">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="play-icon">
+            <path d="M8.4 5.3v13.4c0 .9.9 1.4 1.6.9l10.4-6.7c.7-.4.7-1.4 0-1.8L10 4.4c-.7-.5-1.6 0-1.6.9z"/>
           </svg>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="pause-icon" style="display:none">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-          </svg>
-        </button>
-        <button class="control-btn next">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          <svg viewBox="0 0 24 24" fill="currentColor" class="pause-icon" style="display:none">
+            <rect x="6.6" y="4.8" width="3.6" height="14.4" rx="1.8"/>
+            <rect x="13.8" y="4.8" width="3.6" height="14.4" rx="1.8"/>
           </svg>
         </button>
-        <button class="control-btn search-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        <button class="control-btn next" type="button" aria-label="下一首" title="下一首">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12.4 12 4 6.6v10.8z"/>
+            <path d="M20 12 11.6 6.6v10.8z"/>
+          </svg>
+        </button>
+        <button class="control-btn search-btn" type="button" aria-label="搜索歌曲" title="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+            <circle cx="10.6" cy="10.6" r="6.4"/>
+            <path d="M15.4 15.4 20 20"/>
           </svg>
         </button>
       </div>
-      <div class="progress-container">
+      <div class="progress-container" aria-hidden="true">
         <div class="progress-bar">
           <div class="progress-handle"></div>
         </div>
       </div>
-      <div class="time-display">00:00</div>
+      <div class="time-display" aria-hidden="true">
+        <span class="time-current">00:00</span>
+        <span class="time-remaining">--:--</span>
+      </div>
     `;
 
     this.container.style.outline = 'none';
@@ -134,6 +144,8 @@ class DynamicIslandPlayer {
       playIcon.style.display = 'none';
       pauseIcon.style.display = 'block';
       this.container.querySelector('.cover-art').classList.add('playing');
+      // 容器级状态：供 CSS 驱动波形律动等整体视觉
+      this.container.classList.add('playing');
     });
     
     this.audio.addEventListener('pause', () => {
@@ -142,6 +154,7 @@ class DynamicIslandPlayer {
       playIcon.style.display = 'block';
       pauseIcon.style.display = 'none';
       this.container.querySelector('.cover-art').classList.remove('playing');
+      this.container.classList.remove('playing');
     });
 
     // 移除双击相关的触摸事件代码
@@ -370,6 +383,8 @@ class DynamicIslandPlayer {
    */
   async next() {
     if (this.playlist.length === 0) return;
+    // 触发外部自定义钩子（README 中记录的公开 API）
+    if (typeof this.onNext === 'function') this.onNext();
     this.currentIndex = (this.currentIndex + 1) % this.playlist.length;
     await this.loadSong(this.playlist[this.currentIndex]);
     this.audio.play().catch(console.error);
@@ -390,7 +405,7 @@ class DynamicIslandPlayer {
     }
     
     requestAnimationFrame(() => {
-      this.container.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      // 动画时长与缓动统一由 CSS 变量控制，避免内联样式覆盖分阶段过渡
       this.container.classList.toggle('collapsed', this.isCollapsed);
       
       // 动画结束后移除动画类
@@ -432,12 +447,14 @@ class DynamicIslandPlayer {
 
   /**
    * 更新时间显示
+   * 左侧为已播放，右侧为剩余时长（Apple Music 的读数方式）
    */
   updateTimeDisplay() {
-    const timeDisplay = this.container.querySelector('.time-display');
-    const current = this.formatTime(this.audio.currentTime);
-    const total = this.formatTime(this.audio.duration);
-    timeDisplay.textContent = `${current} / ${total}`;
+    const current = this.container.querySelector('.time-current');
+    const remaining = this.container.querySelector('.time-remaining');
+    current.textContent = this.formatTime(this.audio.currentTime);
+    const left = this.audio.duration - this.audio.currentTime;
+    remaining.textContent = Number.isFinite(left) ? `-${this.formatTime(left)}` : '--:--';
   }
 
   /**
@@ -472,20 +489,41 @@ class DynamicIslandPlayer {
       return title.includes(keyword) || artist.includes(keyword);
     });
 
-    // 渲染搜索结果
-    let html = '';
+    // 渲染搜索结果（使用 DOM 构造，避免歌曲信息被当作 HTML 解析）
+    searchResults.textContent = '';
     if (songs.length > 0) {
-      html = songs.map((song, index) => `
-        <div class="search-result-item" data-index="${this.playlist.findIndex(s => s === song)}">
-          <div class="search-result-title">${song.title}</div>
-          <div class="search-result-artist">${song.artist}</div>
-        </div>
-      `).join('');
+      songs.forEach(song => {
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+        item.dataset.index = this.playlist.indexOf(song);
+
+        const cover = document.createElement('img');
+        cover.className = 'search-result-cover';
+        cover.src = song.cover;
+        cover.alt = '';
+
+        const meta = document.createElement('div');
+        meta.className = 'search-result-meta';
+
+        const title = document.createElement('div');
+        title.className = 'search-result-title';
+        title.textContent = song.title;
+
+        const artist = document.createElement('div');
+        artist.className = 'search-result-artist';
+        artist.textContent = song.artist;
+
+        meta.append(title, artist);
+        item.append(cover, meta);
+        searchResults.appendChild(item);
+      });
     } else {
-      html = '<div class="no-results">暂无相关音乐</div>';
+      const empty = document.createElement('div');
+      empty.className = 'no-results';
+      empty.textContent = '暂无相关音乐';
+      searchResults.appendChild(empty);
     }
     
-    searchResults.innerHTML = html;
     searchResults.classList.add('show');
   }
 
