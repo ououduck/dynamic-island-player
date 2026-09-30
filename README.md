@@ -7,11 +7,12 @@
 ## 特性
 
 - **贴近官方的灵动岛材质**：纯黑「屏幕挖孔」色、内侧发丝高光、两端全圆的胶囊形态，形变使用 iOS 同款缓动曲线 `cubic-bezier(0.32, 0.72, 0, 1)`。
-- **连续形变，不靠 `display:none`**：展开 / 收缩时封面、歌名、按钮、波形、进度条按各自的宽度、透明度、位移分阶段收放，中间帧不跳变。
+- **与官方一致的双层结构**：展开后第一行是封面 + 大字歌名（下方淡色歌手），第二行是居中的三个播放按钮，最底部一条发丝进度条，两端分别是已播放与剩余时长。
+- **连续形变，不靠 `display:none`**：展开 / 收缩时封面、歌名、按钮行、波形、进度条按各自的宽高、透明度、位移分阶段收放，中间帧不跳变。
 - **Live Activity 波形**：收缩态右侧的四根声波柱，播放时以不同节奏律动，暂停时静止成一组图标。
 - **完整播放能力**：播放 / 暂停、上一首 / 下一首、进度点击与拖动、播放结束自动切歌、按歌名与歌手搜索。
-- **移动端适配**：岛宽跟随视口，安全区避让，≥42px 的触摸热区，输入框 16px 字号避免 iOS 聚焦时自动放大页面，触摸设备自动关闭 hover 残留。
-- **可主题化**：26 个 CSS 变量控制尺寸、节奏、配色，无需改动样式文件。
+- **移动端适配**：岛宽跟随视口，安全区避让，触摸时有效热区 ≥42px，输入框 16px 字号避免 iOS 聚焦时自动放大页面，触摸设备自动关闭 hover 残留。
+- **可主题化**：28 个 CSS 变量控制结构尺寸、节奏与配色，无需改动样式文件。
 - **零依赖**：不引入任何框架或字体文件，样式与脚本各一个文件。
 
 ## 快速开始
@@ -36,6 +37,22 @@
 ```
 
 播放器会自动创建 DOM 并固定在视口顶部居中，不需要任何额外的 HTML 结构。
+
+生成的结构如下，覆盖样式时可直接引用这些类名：
+
+```
+.dynamic-island-player          固定于视口顶部居中，纵向两层
+├── .search-box                 搜索面板，绝对定位于岛的下方
+├── .island-head                第一行：封面 + 文字 + 搜索
+│   ├── .cover-art
+│   ├── .player-info > .song-title / .artist
+│   ├── .live-activity > span   四根声波柱
+│   └── .search-btn
+├── .controls                   第二行：三个按钮居中
+│   └── .prev / .play-pause / .next
+├── .progress-container         贴底：轨道 + .progress-bar + .progress-handle
+└── .time-display               与轨道同行，左右两端读数
+```
 
 ### 3. 准备播放列表
 
@@ -119,25 +136,37 @@ player.onNext = () => {
 
 ```css
 .dynamic-island-player {
-  --di-width: 520px;          /* 展开态宽高 */
-  --di-height: 132px;
-  --di-width-collapsed: 280px;/* 收缩态宽高 */
+  --di-width: 520px;            /* 展开态宽高 */
+  --di-height: 170px;
+  --di-width-collapsed: 280px;  /* 收缩态宽高，收缩态圆角恒为胶囊 */
   --di-height-collapsed: 38px;
-  --di-top: 16px;             /* 距视口顶部（与刘海安全区取较大值） */
-  --di-radius: 34px;          /* 展开态圆角，收缩态恒为胶囊 */
-  --di-gap: 14px;             /* 内容间距（收缩态为 --di-gap-collapsed） */
-  --di-duration: 0.5s;        /* 形变时长 */
+  --di-top: 16px;               /* 距视口顶部（与刘海安全区取较大值） */
+  --di-radius: 34px;            /* 展开态圆角 */
+  --di-duration: 0.5s;          /* 形变时长 */
   --di-ease: cubic-bezier(0.32, 0.72, 0, 1);
-  --di-bg: #000;              /* 岛体颜色 */
-  --di-text: #fff;            /* 主标题（另有 --di-text-dim / --di-text-faint） */
-  --di-track: rgba(255,255,255,.2); /* 进度轨道与已填充色 */
-  --di-fill: #fff;
+
+  --di-cover: 54px;             /* 封面直径 */
+  --di-controls-h: 42px;        /* 按钮行高度，收缩态归零 */
+  --di-gap: 14px;               /* 第一行内部的横向间距（收缩态用 --di-gap-collapsed） */
+  --di-row-gap: 14px;           /* 两行之间的纵向间距 */
+  --di-inset: 20px;             /* 岛内左右留白 */
+  --di-pad-top: 18px;
+  --di-pad-bottom: 26px;        /* 底部留给进度条与读数的高度 */
+  --di-bar-bottom: 13px;        /* 进度条距岛底 */
+  --di-time-w: 46px;            /* 进度条两端为时间读数让出的宽度 */
+  --di-progress-h: 3px;         /* 进度条粗细 */
+  --di-eq-h: 16px;              /* 声波基准高度，四根柱子全部由它推导 */
+
+  --di-bg: #000;                /* 岛体颜色 */
+  --di-text: #fff;              /* 主标题（另有 --di-text-dim / --di-text-faint） */
+  --di-track: rgba(255,255,255,.2); /* 进度轨道 */
+  --di-fill: #fff;              /* 进度填充与声波 */
+  --di-hairline: rgba(255,255,255,.08);
   --di-shadow: 0 14px 40px -16px rgba(0,0,0,.75);
-  --di-progress-h: 3px;       /* 进度条粗细 */
-  --di-eq-h: 16px;            /* 声波基准高度 */
-  --di-inset: 20px;           /* 岛内左右留白 */
 }
 ```
+
+改动 `--di-height` 时记得同步 `--di-pad-top / --di-row-gap / --di-cover / --di-controls-h / --di-pad-bottom`，这五项之和就是岛的总高。
 
 响应式断点在 `768px / 420px / 320px` 覆盖同一批变量，窄屏会自动收窄岛宽、放大触摸热区。
 
@@ -162,7 +191,7 @@ dynamic-island-player/
 
 ## 浏览器支持
 
-Chrome / Edge / Safari / Firefox 的近两年版本。依赖 `:has()`、CSS 变量与 `env(safe-area-inset-*)`，不支持 IE。
+Chrome / Edge / Safari / Firefox 的近两年版本。播放器本身只依赖 CSS 变量与 `env(safe-area-inset-*)`，示例页面另用 `:has()` 联动底部提示文案，不支持 IE。
 
 - 系统开启「减弱动态效果」时，形变与旋转动画会自动关闭。
 - 音频是否可播放取决于链接自身的跨域策略与防盗链设置。

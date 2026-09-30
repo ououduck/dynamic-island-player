@@ -13,13 +13,14 @@
 .dynamic-island-player {
   /* —— 尺寸与节奏 —— */
   --di-width: 440px;
-  --di-height: 124px;
+  --di-height: 154px;
   --di-width-collapsed: 252px;
   --di-height-collapsed: 36px;
   --di-top: 12px;
-  --di-radius: 32px;
-  --di-gap: 12px;
+  --di-radius: 34px;
+  --di-gap: 12px; /* 第一行内部的横向间距 */
   --di-gap-collapsed: 9px;
+  --di-row-gap: 14px; /* 两行之间的纵向间距 */
   --di-duration: 0.5s;
   --di-ease: cubic-bezier(0.32, 0.72, 0, 1); /* iOS 形变同款缓动 */
 
@@ -35,9 +36,12 @@
   --di-progress-h: 3px;
   --di-eq-h: 16px;
   --di-inset: 20px;
-  --di-pad-bottom: 22px;
-  --di-bar-bottom: 24px;
-  --di-time-bottom: 7px;
+  --di-pad-top: 18px;
+  --di-pad-bottom: 26px;
+  --di-bar-bottom: 13px;
+  --di-time-w: 46px;
+  --di-cover: 54px;
+  --di-controls-h: 42px;
 
   /* 固定于视口顶部居中；用 margin 居中，把 transform 完整留给形变动画 */
   position: fixed;
@@ -48,10 +52,13 @@
   width: var(--di-width);
   max-width: calc(100% - 16px);
   height: var(--di-height);
-  padding: 0 var(--di-inset) var(--di-pad-bottom);
+  padding: var(--di-pad-top) var(--di-inset) var(--di-pad-bottom);
+  /* 苹果的双层结构：上行「封面 + 歌名」，下行「三个按钮」，进度条贴底 */
   display: flex;
-  align-items: center;
-  gap: var(--di-gap);
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--di-row-gap);
   background: var(--di-bg);
   border-radius: var(--di-radius);
   box-shadow: var(--di-shadow);
@@ -70,6 +77,7 @@
     height var(--di-duration) var(--di-ease),
     border-radius var(--di-duration) var(--di-ease),
     padding var(--di-duration) var(--di-ease),
+    gap var(--di-duration) var(--di-ease),
     transform var(--di-duration) var(--di-ease);
 }
 
@@ -89,11 +97,21 @@
   -webkit-user-drag: none;
 }
 
+/* --- 第一行：封面 + 歌名 + 搜索 --- */
+.island-head {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--di-gap);
+  transition: gap var(--di-duration) var(--di-ease);
+}
+
 /* --- 专辑封面：圆形唱片，播放时旋转（沿用 @keyframes rotate） --- */
 .cover-art {
   flex: 0 0 auto;
-  width: 58px;
-  height: 58px;
+  width: var(--di-cover);
+  height: var(--di-cover);
   border-radius: 50%;
   object-fit: cover;
   background: #17171a;
@@ -118,10 +136,10 @@
 
 .song-title {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   line-height: 1.25;
-  letter-spacing: -0.018em;
+  letter-spacing: -0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -188,16 +206,17 @@
 .dynamic-island-player.playing .live-activity span:nth-child(4) { animation-duration: 1.1s; animation-delay: 0.54s; }
 
 /* --- 控制按钮：苹果只在岛上放裸图标，不加圆形底板 --- */
+/* 第二行：三个按钮居中，收合时整行高度归零、图标向内缩 */
 .controls {
   flex: 0 0 auto;
+  height: var(--di-controls-h);
   display: flex;
   align-items: center;
-  gap: 14px;
-  max-width: 220px;
-  transition: max-width var(--di-duration) var(--di-ease),
+  justify-content: center;
+  gap: 20px;
+  transition: height var(--di-duration) var(--di-ease),
     gap var(--di-duration) var(--di-ease),
-    margin-right var(--di-duration) var(--di-ease),
-    opacity 0.22s ease,
+    opacity 0.16s ease,
     transform var(--di-duration) var(--di-ease);
 }
 
@@ -264,13 +283,21 @@
 
 .prev svg, .next svg { width: 21px; height: 21px; }
 .search-btn svg { width: 19px; height: 19px; }
-.search-btn { opacity: 0.5; }
+/* 搜索键在第一行最右，收合时要连宽度一起收掉，才能留出一条干净的胶囊 */
+.search-btn {
+  opacity: 0.5;
+  transition: opacity 0.2s ease,
+    transform 0.28s var(--di-ease),
+    width var(--di-duration) var(--di-ease),
+    margin var(--di-duration) var(--di-ease);
+}
 
 /* --- 进度条：iOS 式发丝轨道 + 纯白填充（不用渐变与发光） --- */
+/* 读数分居两侧、与轨道同处一行，轨道被两端时间让出 --di-time-w */
 .progress-container {
   position: absolute;
-  left: var(--di-inset);
-  right: var(--di-inset);
+  left: calc(var(--di-inset) + var(--di-time-w));
+  right: calc(var(--di-inset) + var(--di-time-w));
   bottom: var(--di-bar-bottom);
   height: var(--di-progress-h);
   display: flex;
@@ -329,17 +356,19 @@
   height: 5px;
 }
 
-/* 读数：左侧已播放、右侧剩余，贴合 Apple Music 的排布 */
+/* 读数：左侧已播放、右侧剩余，与轨道居同一行 */
 .time-display {
   position: absolute;
   left: var(--di-inset);
   right: var(--di-inset);
-  bottom: var(--di-time-bottom);
+  bottom: var(--di-bar-bottom);
+  height: var(--di-progress-h);
   display: flex;
+  align-items: center;
   justify-content: space-between;
   font-size: 10px;
   font-weight: 500;
-  line-height: 12px;
+  line-height: 1;
   letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
   color: var(--di-text-faint);
@@ -352,18 +381,19 @@
    ========================================================================== */
 .dynamic-island-player.collapsed {
   --di-eq-h: 13px;
+  --di-gap: var(--di-gap-collapsed);
+  --di-row-gap: 0;
+  --di-cover: 20px;
+  --di-controls-h: 0;
   width: var(--di-width-collapsed);
   height: var(--di-height-collapsed);
   padding: 0 12px;
-  gap: var(--di-gap-collapsed);
   border-radius: 999px;
   overflow: hidden;
   cursor: pointer;
 }
 
 .collapsed .cover-art {
-  width: 20px;
-  height: 20px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
@@ -385,12 +415,17 @@
   opacity: 0.9;
 }
 
+/* 收合：按钮整行消失，只留第一行的封面与歌名 */
 .collapsed .controls {
-  max-width: 0;
-  gap: 0;
-  margin-right: calc(var(--di-gap-collapsed) * -1);
   opacity: 0;
-  transform: scale(0.6);
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.collapsed .search-btn {
+  width: 0;
+  margin-left: calc(var(--di-gap) * -1);
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -581,77 +616,87 @@
 @media (max-width: 768px) {
   .dynamic-island-player {
     --di-width: calc(100vw - 28px);
-    --di-height: 118px;
+    --di-height: 146px;
     --di-width-collapsed: min(240px, calc(100vw - 120px));
-    --di-radius: 30px;
+    --di-radius: 32px;
     --di-top: 10px;
     --di-gap: 11px;
     --di-gap-collapsed: 8px;
+    --di-row-gap: 12px;
     --di-inset: 16px;
-    --di-bar-bottom: 22px;
+    --di-pad-top: 16px;
+    --di-pad-bottom: 24px;
+    --di-bar-bottom: 12px;
+    --di-time-w: 43px;
+    --di-cover: 50px;
+    --di-controls-h: 38px;
   }
 
-  .cover-art { width: 52px; height: 52px; }
-  .song-title { font-size: 15px; }
+  .song-title { font-size: 16px; }
   .artist { font-size: 12px; height: 16px; line-height: 16px; }
-  .controls { gap: 12px; }
+  .controls { gap: 18px; }
   .control-btn { width: 24px; height: 24px; }
   .control-btn svg { width: 18px; height: 18px; }
   .play-pause { width: 36px; height: 36px; }
   .play-pause svg { width: 26px; height: 26px; }
   .prev svg, .next svg { width: 19px; height: 19px; }
 
-  .dynamic-island-player.collapsed { padding: 0 11px; }
-  .collapsed .cover-art { width: 19px; height: 19px; }
+  .dynamic-island-player.collapsed { --di-cover: 19px; padding: 0 11px; }
 }
 
-/* 手机：优先保证歌名可读，收紧封面与控制区把宽度让给文字 */
+/* 手机：优先保证歌名可读，收紧封面与按钮行把宽度让给文字 */
 @media (max-width: 420px) {
   .dynamic-island-player {
     --di-width: calc(100vw - 20px);
-    --di-height: 112px;
+    --di-height: 124px;
     --di-width-collapsed: min(184px, calc(100vw - 96px));
-    --di-radius: 28px;
+    --di-radius: 30px;
     --di-top: 8px;
     --di-gap: 10px;
+    --di-row-gap: 10px;
     --di-inset: 14px;
-    --di-pad-bottom: 20px;
-    --di-bar-bottom: 21px;
-    --di-time-bottom: 6px;
+    --di-pad-top: 13px;
+    --di-pad-bottom: 21px;
+    --di-bar-bottom: 10px;
+    --di-time-w: 40px;
+    --di-cover: 42px;
+    --di-controls-h: 33px;
   }
 
-  .cover-art { width: 46px; height: 46px; }
-  .controls { gap: 10px; }
+  .song-title { font-size: 15px; }
+  .controls { gap: 16px; }
   .control-btn { width: 22px; height: 22px; }
   .control-btn svg { width: 17px; height: 17px; }
-  .play-pause { width: 34px; height: 34px; }
-  .play-pause svg { width: 24px; height: 24px; }
+  .play-pause { width: 32px; height: 32px; }
+  .play-pause svg { width: 23px; height: 23px; }
 
   /* 16px 字号可阻止 iOS Safari 聚焦输入框时自动放大整页 */
   .search-input { font-size: 16px; padding: 12px 14px; }
   .search-result-item { padding: 8px 9px; }
   .search-result-cover { width: 34px; height: 34px; }
 
-  .dynamic-island-player.collapsed { padding: 0 10px; }
-  .collapsed .cover-art { width: 17px; height: 17px; }
+  .dynamic-island-player.collapsed { --di-cover: 17px; padding: 0 10px; }
 }
 
 @media (max-width: 320px) {
   .dynamic-island-player {
     --di-width: calc(100vw - 14px);
-    --di-height: 106px;
+    --di-height: 114px;
     --di-width-collapsed: min(164px, calc(100vw - 76px));
-    --di-radius: 26px;
+    --di-radius: 28px;
+    --di-row-gap: 9px;
     --di-inset: 12px;
-    --di-pad-bottom: 18px;
-    --di-bar-bottom: 19px;
-    --di-time-bottom: 5px;
+    --di-pad-top: 12px;
+    --di-pad-bottom: 19px;
+    --di-bar-bottom: 9px;
+    --di-time-w: 37px;
+    --di-cover: 38px;
+    --di-controls-h: 31px;
   }
 
-  .cover-art { width: 40px; height: 40px; }
   .song-title { font-size: 14px; }
-  .controls { gap: 8px; }
-  .play-pause { width: 32px; height: 32px; }
+  .controls { gap: 14px; }
+  .play-pause { width: 30px; height: 30px; }
 }
 
 /* 触摸设备：去掉 hover 残留、放大点击热区 */

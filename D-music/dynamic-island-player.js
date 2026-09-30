@@ -39,13 +39,21 @@ class DynamicIslandPlayer {
         <input type="text" class="search-input" placeholder="搜索歌曲、歌手…">
         <div class="search-results"></div>
       </div>
-      <img class="cover-art" src="" alt="封面">
-      <div class="player-info">
-        <p class="song-title">未播放</p>
-        <p class="artist">未知歌手</p>
-      </div>
-      <div class="live-activity" aria-hidden="true">
-        <span></span><span></span><span></span><span></span>
+      <div class="island-head">
+        <img class="cover-art" src="" alt="封面">
+        <div class="player-info">
+          <p class="song-title">未播放</p>
+          <p class="artist">未知歌手</p>
+        </div>
+        <div class="live-activity" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <button class="control-btn search-btn" type="button" aria-label="搜索歌曲" title="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
+            <circle cx="10.6" cy="10.6" r="6.4"/>
+            <path d="M15.4 15.4 20 20"/>
+          </svg>
+        </button>
       </div>
       <div class="controls">
         <button class="control-btn prev" type="button" aria-label="上一首" title="上一首">
@@ -67,12 +75,6 @@ class DynamicIslandPlayer {
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12.4 12 4 6.6v10.8z"/>
             <path d="M20 12 11.6 6.6v10.8z"/>
-          </svg>
-        </button>
-        <button class="control-btn search-btn" type="button" aria-label="搜索歌曲" title="搜索">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true">
-            <circle cx="10.6" cy="10.6" r="6.4"/>
-            <path d="M15.4 15.4 20 20"/>
           </svg>
         </button>
       </div>
